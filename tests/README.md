@@ -202,4 +202,3 @@ If tests fail:
 ## Related Documentation
 
 - [Main README](../README.md) - Package documentation
-- [Migration Guide](../MIGRATION.md) - Migration from standalone script

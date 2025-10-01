@@ -7,16 +7,18 @@ A configurable Python tool for detecting and redacting sensitive data in text us
 ### Installation
 
 ```bash
-# Using uv (recommended)
-uv pip install entrophier
-
-# Or using pip
-pip install entrophier
-
-# Or install from source
-git clone https://github.com/yourusername/python-entrophier.git
+# Development installation with uv (recommended)
+git clone https://github.com/rjury-sumo/python-entrophier.git
 cd python-entrophier
 uv sync
+
+# Or install locally with uv
+uv pip install .
+
+# Or install with pip
+pip install .
+
+# Note: Package not yet published to PyPI
 ```
 
 ### Command-Line Usage
@@ -36,11 +38,6 @@ cat logfile.txt | entrophier
 
 # Save to file
 entrophier -c -o output.txt input.txt
-
-# Run comprehensive tests
-uv run python tests/test_entropy.py
-# or with pytest
-uv run pytest tests/
 ```
 
 ## 📋 Features
@@ -187,28 +184,78 @@ Original: user-session-abc123def456-another-xyz789abc123
 Redacted: user-session-************-another-************
 ```
 
-## 🧪 Testing
+## 🛠️ Development
 
-Run the comprehensive test suite:
+### Setup Development Environment
 
 ```bash
-# Using uv
-uv run python tests/test_entropy.py
+# Clone the repository
+git clone https://github.com/rjury-sumo/python-entrophier.git
+cd python-entrophier
 
-# Or with pytest
-uv run pytest tests/
+# Install with uv (creates .venv automatically)
+uv sync
 
-# With coverage
-uv run pytest --cov=entrophier tests/
+# Verify installation
+uv run python -c "from entrophier import redact_sensitive_data, load_config; load_config(); print('✓ Setup complete')"
+```
+
+### Development Workflow
+
+```bash
+# Run tests during development
+uv run pytest
+
+# Run tests with coverage
+uv run pytest --cov=entrophier --cov-report=term-missing
+
+# Run CLI in development mode
+uv run entrophier input.txt
+
+# Build package
+uv build
+
+# Run specific module
+uv run python -m entrophier input.txt
+```
+
+### Project Dependencies
+
+- **Runtime**: `pyyaml>=6.0.0`
+- **Development**: `pytest>=8.0.0`, `pytest-cov>=4.0.0`
+- **Python**: 3.13+ (managed by uv)
+- **Build**: hatchling (specified in pyproject.toml)
+
+## 🧪 Testing
+
+Run the comprehensive pytest test suite (40 tests):
+
+```bash
+# Run all tests
+uv run pytest
+
+# With verbose output
+uv run pytest -v
+
+# With coverage report
+uv run pytest --cov=entrophier
+
+# Run specific test class
+uv run pytest tests/test_entropy.py::TestEntropyCalculation -v
 ```
 
 The test suite includes:
+- Entropy calculation and segment detection
+- Word preservation and pattern matching
 - AWS S3 CloudTrail and CloudWatch paths
-- Container and Docker paths
+- Container and Docker paths (Kubernetes, Docker)
 - Windows and Linux file paths
 - Database connection strings
-- IP addresses and network identifiers
+- IP addresses (IPv4/IPv6) and network identifiers
 - Various timestamp and datetime formats
+- Edge cases and boundary conditions
+
+See [tests/README.md](tests/README.md) for detailed test documentation.
 
 ## 🔧 How It Works
 
@@ -250,11 +297,13 @@ python-entrophier/
 
 ## ⚠️ Configuration Requirements
 
-The script will exit with an error if any required configuration files or settings are missing. This ensures consistent behavior and prevents fallback to hardcoded values.
+The package will exit with an error if any required configuration files or settings are missing. This ensures consistent behavior and prevents fallback to hardcoded values.
+
+**Default Configuration**: Config files are bundled with the package in `src/entrophier/`. For custom configurations, use the `--config-dir` CLI option or `load_config(config_dir="/path/to/config")` in Python.
 
 Required sections in YAML files:
 - `common_words.yaml`: `common_words`, `word_patterns`
-- `entropy_settings.yaml`: `entropy_detection`, `output_formatting`
+- `entropy_settings.yaml`: `entropy_detection`, `pattern_detection`
 - `redaction_patterns.yaml`: Pattern sections as needed
 
 ## 🎛️ Customization
@@ -283,4 +332,45 @@ common_words:
   - projectname
 ```
 
-This tool provides enterprise-grade sensitive data redaction with full configurability and no hardcoded assumptions about your data formats.
+## 📦 Building and Distribution
+
+### Build Package
+
+```bash
+# Build wheel and source distribution
+uv build
+
+# Output files in dist/:
+# - entrophier-0.1.0-py3-none-any.whl
+# - entrophier-0.1.0.tar.gz
+```
+
+### Install Built Package
+
+```bash
+# Install wheel locally
+uv pip install dist/entrophier-0.1.0-py3-none-any.whl
+
+# Or install from source distribution
+uv pip install dist/entrophier-0.1.0.tar.gz
+```
+
+## 📚 Additional Documentation
+
+- **[Test Documentation](tests/README.md)**: Comprehensive test suite details
+
+## 🤝 Contributing
+
+This is a defensive security tool. Contributions should focus on:
+- Improving detection accuracy
+- Adding new pattern types
+- Enhancing performance
+- Expanding test coverage
+
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+## 🔒 Security Note
+
+This tool provides enterprise-grade sensitive data redaction with full configurability and no hardcoded assumptions about your data formats. However, always verify redaction results for your specific use case before using in production.

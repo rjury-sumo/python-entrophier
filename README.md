@@ -4,24 +4,43 @@ A configurable Python tool for detecting and redacting sensitive data in text us
 
 ## 🚀 Quick Start
 
+### Installation
+
+```bash
+# Using uv (recommended)
+uv pip install entrophier
+
+# Or using pip
+pip install entrophier
+
+# Or install from source
+git clone https://github.com/yourusername/python-entrophier.git
+cd python-entrophier
+uv sync
+```
+
+### Command-Line Usage
+
 ```bash
 # Process a file (redacted output only)
-python3 entropy.py input.txt
+entrophier input.txt
 
 # Comparative mode (see original vs redacted)
-python3 entropy.py -c input.txt
+entrophier -c input.txt
 
 # Comparative mode with condensed asterisks
-python3 entropy.py -c test_strings.txt --condense-asterisks
+entrophier -c test_strings.txt --condense-asterisks
 
 # Process stdin
-cat logfile.txt | python3 entropy.py
+cat logfile.txt | entrophier
 
 # Save to file
-python3 entropy.py -c -o output.txt input.txt
+entrophier -c -o output.txt input.txt
 
 # Run comprehensive tests
-python3 test_entropy.py
+uv run python tests/test_entropy.py
+# or with pytest
+uv run pytest tests/
 ```
 
 ## 📋 Features
@@ -94,7 +113,7 @@ aws_selective_patterns:
 ## 🛠️ Command-Line Options
 
 ```bash
-python3 entropy.py [options] [input_file]
+entrophier [options] [input_file]
 
 Options:
   -c, --comparative           Show original and redacted (default: redacted only)
@@ -103,6 +122,7 @@ Options:
   --threshold THRESHOLD       Override entropy threshold
   --min-length MIN_LENGTH     Override minimum length
   --condense-asterisks        Condense consecutive asterisks to single *
+  --config-dir CONFIG_DIR     Directory containing configuration files
 
 Positional:
   input_file                  Input file path (use "-" or omit for stdin)
@@ -111,17 +131,20 @@ Positional:
 ## 📚 Library Usage
 
 ```python
-from entropy import redact_sensitive_data, load_config
+from entrophier import redact_sensitive_data, load_config
 
-# Load configuration (required)
+# Load configuration (required - uses default config files from module directory)
 load_config()
 
 # Basic usage (recommended)
 result = redact_sensitive_data("model-scheduler-667689996-jd4g7")
 # Output: "model-scheduler-*********-*****"
 
+# Use custom config directory
+load_config(config_dir="/path/to/config")
+
 # Alternative methods
-from entropy import redact_high_entropy_tokens, redact_high_entropy_strings
+from entrophier import redact_high_entropy_tokens, redact_high_entropy_strings
 
 # Token-level approach (more reliable)
 result = redact_high_entropy_tokens("text")
@@ -169,7 +192,14 @@ Redacted: user-session-************-another-************
 Run the comprehensive test suite:
 
 ```bash
-python3 test_entropy.py
+# Using uv
+uv run python tests/test_entropy.py
+
+# Or with pytest
+uv run pytest tests/
+
+# With coverage
+uv run pytest --cov=entrophier tests/
 ```
 
 The test suite includes:
@@ -197,16 +227,25 @@ The tool uses Shannon entropy to measure randomness in character distributions:
 - Pattern matching for word prefixes/suffixes
 - Contextual analysis to avoid redacting legitimate words
 
-## 📁 File Structure
+## 📁 Project Structure
 
 ```
-high_entropy_experiments/
-├── entropy.py                    # Main script with CLI
-├── test_entropy.py              # Comprehensive test suite
-├── common_words.yaml            # Word lists and patterns
-├── entropy_settings.yaml        # Detection and output settings
-├── redaction_patterns.yaml      # Regex patterns for structured data
-└── readme.md                    # This documentation
+python-entrophier/
+├── src/
+│   └── entrophier/
+│       ├── __init__.py          # Public API exports
+│       ├── __main__.py          # Module entry point
+│       ├── cli.py               # Command-line interface
+│       ├── config.py            # Configuration loading
+│       ├── core.py              # Core redaction logic
+│       ├── common_words.yaml    # Word lists and patterns
+│       ├── entropy_settings.yaml # Detection and output settings
+│       └── redaction_patterns.yaml # Regex patterns for structured data
+├── tests/
+│   └── test_entropy.py          # Comprehensive test suite
+├── pyproject.toml               # Project metadata and dependencies
+├── README.md                    # This documentation
+└── .python-version              # Python version (3.13)
 ```
 
 ## ⚠️ Configuration Requirements

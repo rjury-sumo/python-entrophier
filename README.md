@@ -223,7 +223,7 @@ uv run python -m entrophier input.txt
 
 - **Runtime**: `pyyaml>=6.0.0`
 - **Development**: `pytest>=8.0.0`, `pytest-cov>=4.0.0`
-- **Python**: 3.13+ (managed by uv)
+- **Python**: 3.8+ (compatible with Python 3.8 through 3.13)
 - **Build**: hatchling (specified in pyproject.toml)
 
 ## 🧪 Testing
@@ -358,6 +358,7 @@ uv pip install dist/entrophier-0.1.0.tar.gz
 ## 📚 Additional Documentation
 
 - **[Test Documentation](tests/README.md)**: Comprehensive test suite details
+- **[Changelog](CHANGELOG.md)**: Version history and release notes
 
 ## 🤝 Contributing
 

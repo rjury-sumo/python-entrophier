@@ -258,8 +258,9 @@ class TestIPAddressRedaction:
         assert "connection" in result
         assert "from" in result
         assert "port" in result
-        # Note: IPv4 in this format may not trigger pattern-based redaction
-        # Check that at least the result contains the context words
+        # IPv4 should be redacted by pattern matching
+        assert "192.168.1.100" not in result
+        assert "*" in result
 
     def test_redact_ipv6(self, setup_config):
         """Test IPv6 address redaction."""
